@@ -1,0 +1,504 @@
+Anotações BootCamp (a serem organizadas):
+
+Node.js (BACKEND)
+
+yarn add ts-node-dev -D -> comando para instalar pacote que permite a um build no desenvolvimento
+fazendo com que não tenhamos que buildar toda hora. Além disso ele também já faz o carregamento
+rápido do nodemon
+  * --transpileOnly --> não vai verificar se nosso código ta errado, vai só executar, pois o
+  trabalho de mostrar o erro já é do VSCode
+  * --ignore-watch --> evita que nosso ts-node-dev fique observando alterações e ignora a pasta
+  * --inspect --> possibilita que o VSCode se conecte ao nosso código em desenvolvimento
+
+EditorConfig --> padronizar configurações entre diferentes editores de código! Facilitando
+trabalhos em equipe (baixar nas extensções do VSCode)
+  * trim_trailing_whitespace --> Elimina os espaços em branco na frente das linhas
+  * insert_final_newline --> Faz com que a última linha seja uma linha em branco, facilitando ir
+  para a última linha.
+  * end_of_line = lf --> Normalizar a linha em branco para qualquer SO
+
+ESLint --> padroniza alguns pequenos detalhes para evitar problemas entre editores de código, como
+o uso das aspas duplas ou únicas
+  * yarn add eslint -D --> Instalar o ESLint
+  * yarn eslint --init
+  * yarn add -D @typescript-eslint/eslint-plugin@latest eslint-config-airbnb-base@latest
+   eslint-plugin-import@^2.20.1 @typescript-eslint/parser@latest --> após o eslint init adicionar
+   esses plugins, após responder as perguntas
+  * Por fim baixar o ESLint nas extensões do VSCode
+  * yarn add -D eslint-import-resolver-typescript --> habilita o código a entender importações do
+  tipo typescript
+  * .eslintignore --> usado para ignorar algumas pastas que não precisam passar pelas regras
+  * Dentro de rules
+    --> "class-methods-use-this": "off" (serve para o eslint não pedir mais que se use "this"
+    dentro de funções de classes)
+    --> "@typescript-eslint/camelcase": "off" (faz com que não dê erro quando as váriaveis não
+    são declaradas em camelcase -> providerId)
+    --> "@typescript-eslint/no-unused-vars": ["error", {
+      "argsIgnorePattern": "_"
+    }], (Faz com que quando temos que colocar uma váriavel mas não vamos usar ele ignore quando
+    colocarmos "_" no lugar do nome da variável)
+ESLint React!!
+  * Dentro de rules React:
+    --> "react/jsx-filename-extension": [1, {"extension": [".tsx"]}] (Faz com que em arquivos
+    tsx também possam ser lidos arquivos jsx)
+    --> "import/prefer-default-export": "off" (Faz com que quando só aja uma exportação sendo
+    feita ela não precise necessariamente ser default)
+    --> "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "ts": "never",
+        "tsx": "never"
+      }
+    ] (Faz com que importações do tipo .ts e .tsx não precisem ser colocadas essas terminações
+    no final dos arquivos importados)
+    --> "@typescript-eslint/explicit-function-return-type": [
+      "error",
+      {
+        "allowExpressions": true
+      }
+    ], (regra para fazer com que arrow functions não precisam declarar o tipo de retorno)
+  * yarn add eslint-import-resolver-typescript -D --> plugin para fazer com que o React consiga
+  entender arquivos typescript.
+
+
+Prettier --> serie de configurações automáticas para deixar o código mais "bonito"
+  * yarn add prettier eslint-config-prettier eslint-plugin-prettier -D --> pacotes para adicionar
+  o prettier e mais alguns adicionais para funcionar com eslint
+  * prettier.config.js --> usado para mudar alguns padrões do prettier, para não conflitar com o
+  eslint entre outros
+  *Configurações Prettier (prettier.config.js):
+    module.exports = {
+      singleQuote: true, (Sempre usar as aspas simples)
+      trailingComma: 'all', (Sempre colocar , quando for necessário)
+      allowParens: 'avoid' (Evitar parenteses em arrow function com uma só variável)
+  }
+
+
+Debug --> usaremos o debug do próprio VSCode para achar os erros dos nossos projetos!
+  * Algumas mudanças no launch:
+    "request": "attach", (fica "observando" para entrar no programa no meio dele)
+    "name": "Debug",
+    (REMOVIDO) "program": "${workspaceFolder}/index.js",
+    "protocol": "inspector", (inspeciona para ligar na hora certa)
+    "restart": true,
+  * Clicamos ao lado da linha que queremos inspecionar, botando uma bolinha vermelha, no
+  debug ele vai parar ali para você poder inspecionar
+
+
+yarn add date-fns --> Baixar biblioteca para lidar com datas e horários
+  * startOfHouer --> como já diz o método, muda o horário para o começo daquela hora
+  * parseISO --> transforma a hora no método Date() do próprio JS
+  * isEqual --> verifica se uma data é igual a outra, em data e horário
+
+
+Repositório:
+  * É uma conexão da persistência dos dados com a nossa rota
+    (Persistência <-> Repositório <-> Rota)
+  * Dentro do repositório terão metodos que nos permitam interagir com o banco de dados,
+  como o método find e create
+  * Um repositório por model
+  * São criados em formato de classe e possuem as funções para mexerem com os dados do
+  repositório, é como uma orientação a objeto
+
+
+SoC - Separations of Concerns (Separação de preocupações):
+  * É bem direto ao que o próprio título diz, uma separação de afazeres, cada rota não deve
+  ficar preocupada com muitas coisas ao mesmo tempo! Por isso abstraimos o código para
+  essa filosofia
+  * Nossa rota deve estar preocupada só com um processo --> Receber uma requisição - chamar
+  outro arquivo - Devolver uma requisição
+
+
+
+DTO - Data Transfer Object:
+ * É o processo de transferir dados de um arquivo pra outro através de objetos
+ * Criamos um objeto para armazenar o que queremos enviar e tornar mais fácil a adição
+ de informações no futuro
+
+
+Regras de negócio:
+  * Quando é algo muito específico da minha aplicação pode ser considerada uma regra de
+  negócio (com o tempo vai ter que ser alterado)
+  * São usados Services para manejar cada regra de negócio diferente do nosso projeto!
+  Mas os services não tem acesso aos dados do nosso requerimento
+  * sempre que o service tiver uma dependência externa o service que usa ele deve receber
+  o mesmo e não criar um novo, isso é feito através do constructor (Dependency Inversion)
+  * Uma transformação de dados é diferente de uma regra de negócio!!
+
+
+Dependency Inversion:
+  * Isso acontece quando precisamos de uma dependência única, então não podemos criar
+  outro objeto, por isso usamos, por exemplo, o método constructor para conseguir
+  obter essas dependências
+
+
+3 níveis de abstração do mapeamento de registro do banco de dados:
+  1 - node-postgres: mexendo na própria ferramenta do node, temos o nível mais baixo
+  2 - Knex: aqui podemos usar
+  3 - ORM: quando mapeamos os registros usando objetos do próprio Java
+
+Object Relational Mapping: (TypeORM)
+  * Mapear registros do banco de dados com objetos do JavaScript
+  * Ferramentas:
+    * Quando usando JavaScript uma boa ferramenta é o Sequelizer
+    * Quando usando TypeScript uma boa ferramenta é o TypeORM (https://typeorm.io/#/)
+  * O TypeORM usa o Knex por baixo dos panos, então usa-lo abre a possibilidade de você
+  também usar o Knex quando necessário, para algo mais complexo
+  * Já usando diretamente o drive temos pouca abstração e não permite a troca de banco
+  de dados (como usando o node-postgres)
+  * Common connection options --> espaço no site pra saber algumas váriaveis comuns no
+  arquivo de ormconfig do seu projeto.
+  * Para diferentes tipos de banco de dados (mySQL, postgre, SQLite) devemos baixar drivers
+  diferentes, informados no começo do site.
+  * yarn add typeorm pg --> driver para postgreSQL
+  * Colocamos esse comando no package.json para que o programa consiga converter as
+  migrations para typescript --> "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js"
+  * yarn typeorm migration:create -n CreateAppointments --> Criando uma nova migration
+  com o nome após -n
+  * TypeORM já tem métodos prontos como o de all e create, por isso não precisamos mais
+  deles no repositório!!!
+
+
+Docker
+  * Como funciona?
+    - O docker funciona para várias coisas, mas no projeto usaremos para criação de
+    ambiente isolados (Ambientes que não vão interferir no funcionamento de outras
+    tecnologias). Como quando baixamos um programa que mexe em arquivos do nosso sistema
+    operacional, para atualizar ou deletar seria uma dor de cabeça.
+    - Ele faz um container para abrigar esses programas e impedir que ele façam essas
+    modificações em arquivos do nosso SO.
+    - Os containers expões portas para comunicação para que possamos interagir com ele
+    mesmo isolado no container (uma porta :5432, por exemplo) (desenho no caderno)
+  * Principais conceitos:
+    - Imagem: um serviço disponível do Docker (postgreSQL, MangoSQL) que podemos colocar
+    num container na nossa aplicação
+    - Container: é uma instância de uma imagem do Docker (podemos ter três containers
+    do postgreSQL, por exemplo)
+    - Docker Registry (Docker Hub): é uma nuvem onde ficam todas as imagens do Docker,
+    como o node que possui uma nuvem para as suas extensões.
+      --> Dockerfile: receita para nós montarmos uma imagem do 0, fazendo nossa aplicação
+      conseguir rodar em um servidor do total 0 (dando muita flexibilidade para mudar de
+      servidor)
+  * Crinado uma instância no Docker
+    - sudo docker run --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+    - sudo docker ps --> ver todos os containers criados e seus status
+    - sudo docker logs id --> para ver tudo que ta executando no container, em caso de achar um
+    erro ou algo assim.
+    - sudo docker start id --> inicializa o container da imagem que você quer usar, sempre
+    fazer isso ao reinicializar o computador.
+
+
+Migrations:
+  * As migrations são interessantes para manter grupos de desenvolvedores organizados ao
+  mexer com os bancos de dados (Elas mantém os bancos de dados nas mesmas versões e com
+  informações atualizadas)
+  * Método up: O que a migration vai fazer no banco de dados quando ela for executada!
+  (Alterações, criação de uma nova tabela)
+  * Método down: Serve para desfazer o que é feito na tabela up, então é responsável por
+  deletar tabelas, retirar campos, mudar tipos etc..
+  * Comandos:
+    - yarn typeorm migration:run --> Criar e salvar as migrations
+    - yarn typeorm migration:revert --> Reverte as migrations criadas (deleta elas)
+    - yarn typeorm migration:show --> Mostra as migrations existentes
+  * !!! Você só pode alterar uma migration se ela não foi enviada ainda pro sistema de
+  controle de versão (quando ela só existe na sua máquina você pode alterar)
+  * ^ Quando isso acontecer, para mudar uma migration devemos criar uma outra cujo propo-
+  sito é exatamente mudar uma parte de outra migration! (fazemos aqui com provider para
+  provider_id)
+
+
+(TypeORM related - Na verdade é basicamente comandos do TypeORM)
+Decorators:
+* Mudança no tsconfig.json para conectar o model com o data:
+  1 - "experimentalDecorators": true, --> Enables experimental support for ES7 decorators.
+  2 - "emitDecoratorMetadata": true, --> Enables experimental support for emitting
+  type metadata for decorators.
+    * Habilitam os decorators, funcionalidades muito baseadas no JavaScript. O Decorator
+    funciona com uma função, ele é acionado com @ antes dele e pega o que está abaixo dele
+    como seu parâmetro, como uma classe inteira!
+* Para o server entender os decorators precisamos baixar um outro pacote:
+              yarn add reflect-metadata
+* O tsconfig declara e fornece as váriaveis para o banco de dados por baixo dos panos!!
+  mas para o erro de declarar variáveis não aparecer, desabilitamos:
+  "strictPropertyInitialization": false, --> Enable strict checking of property
+  initialization in classes.
+  * Entity:
+    No caso no Entity, ele recebe a classe e o repositório de dados, e no caso do exemplo
+    da aula ele pega a classe e salva ela no banco de dados.
+  * Column:
+    É usado para definir as colunas comuns com um valor default de varchar, mas podemos
+    passar valores diferentes
+  * JoinColumn:
+    Quando queremos dizer qual coluna está se relacionando, normalmente com foreign keys
+  * PrimaryGeneratedColumn:
+    Define a chave primária, normalmente o id, quando ele é gerado automaticamente. Ele
+    recebe o tipo!
+  * CreateDateColumn:
+    Já são colunas pré-feitas para o tipo de coluna created_at, que são bem comuns no meio
+    de desenvolvimento.
+  * UpdateDateColumn:
+    O mesmo do CreateDateColumn mas para a coluna de update_at.
+  * EntityRepository:
+    Faz o mesmo de Entity, mas recebe um model para usar no repositório, em vez do nome do
+  banco de dados!
+  * getCustomRepository:
+    Método do typeORM para pegarmos um repositório que desejarmos no banco de dados, sendo
+  assim não precisamos mais criar um objeto dos repositórios.
+  * Repository:
+    Repository é um decorator com várias funções básicas de rotas, como o Create e o All,
+  chamamos ela como um pai para nossa classe (extends) e enviamos nosso model como
+  parâmetro.
+    -> findOne: uma das funções do Repository, que recebe "Where { informação }"
+    -> Create: ele cria uma instância para nosso banco de dados, mas ele não salva, por
+    isso não precisa de async await
+    -> Save: função async await que salva os dados que você informa no build
+    -> Find: o método all, await async, pega todos os arquivos salvos no BD
+  * In:
+    Usado para checar todas as informações de algum repositório, ele recebe a informação
+    que você quer ver se existe no repositório.
+
+
+Tipos de relacionamentos SQL (Cada uma tem sua Decorator em inglês):
+  * Um para um -> um usuário participar de um agendamento
+  * Um para muitos -> um usuário participar de muitos agendamentos
+  * Muitos para muitos -> muitos usuários participando de muitos agendamentos (?)
+
+Função asincrona: (async await)
+  O retorno de uma função asincrona SEMPRE vai ser uma promise, e dentro da própria promise
+  nós dizemos qual o tipo de retorno dela func(): Promise<Tipo>
+
+
+KISS (Keep It Simple & Stupid):
+  Tentar deixar o código simples e deixar algo muito complicado que não é necessário agora
+  para ser feito no futuro, tentando sempre manter simples.s
+
+Bcryptjs:
+  * Uma biblioteca para fazer a criptografia de senhas
+  * yarn add bcryptjs --> Download do bcryptjs
+  * Métodos:
+    -> Hash: recebe uma string e criptografa ela, retornando a versão já cripto..(recebe a
+    senha a ser crip e um número ou string para fazer a crip)
+    -> Compare: compara uma senha crip com uma não crip e vê se elas batem (Recebe a senha
+    não criptografada e a senha criptografada)
+
+
+JWT (JSON Web Token):
+  * yarn add jsonwebtoken --> adicionar o pacote do JWT no projeto
+  * yarn add @types/jsonwebtoken -D --> Adicionar as tipagens do pacote
+  * É um estilo comum de criação de tokens de acesso baseados em JSON
+  * Autenticação JWT:
+    - Ao enviarmos as informações do usuário, por exemplo, o programa checa no banco de
+    dados a pertinência das informações e então gera um Token JWT
+    - Um Token JWT é dívido em:
+      1. Headers (que ajudam a definir o tipo de token criado)
+      2. Payload (informações do usuário dentro do token, mas não são usadas informações
+      sensíveis como senhas)
+      3. Assinatura (é a parte de assinatura que garante que o token não foi modificado por
+      outro usuário)
+  * Comandos pacote JWT:
+    -> Sign: função que cria a assinatura, primeiro ela recebe as informações que ficaram no
+    token em formato de objeto (Payload), segundo ele pega uma chave secreta em forma de String
+    (para criar ela podemos usar o md5 e digitar algo aleatório), terceiro ele recebe algumas
+    configurações:
+      - subject: id do usuário que gerou o token
+      - expiresIn: quanto tempo esse token vai durar (não fazer durar muito)
+    -> Verify: verifica se um token existente é autêntico, ele recebe o valor aleatório do
+    token e a chave única que foi usada para criar ele.
+  * jwt.io --> site de Debugger de tokens
+  * insomnia --> no insomnia, dentro de uma chamada, já temos uma sessão de authorization para
+  colocarmos direto o token lá
+
+
+Middlewares:
+  * Para usar em todas as rotas, podemos usar a função .use nas rotas desejadas e passar o
+  middleware como parâmetro.
+  * Para passar em somente uma rota -> .get('/', middleware, async (request... colocamos no
+  meia do caminho da rota e da função.
+
+Mdwares:
+  - Multer:
+    * yarn add multer --> middleware para lidar com o carregamento de imagens (também
+    necessário baixar os types -> yarn add @types/multer)
+    * !!! Para abrigar as imagens vamos criar uma pasta tmp (temporária), e dentro dela
+    criamos um gitkeep para que no gitignore possamos ignorar a pasta tmp menos o keep.
+    * Dentro da pasta config criamos uma configuração para o multer, recebendo um objeto com
+    a pasta aonde serão mantidas as imagens e uma função para criar um nome aleatório de file.
+    * Já dentro das rotas importamos o multer que recebe a config como parâmetro! E ele possui
+    vários métodos para postar arquivos:
+      -> Single: somente um arquivo
+      -> Array: vários arquivos
+      -> None: nenhum arquivo
+      -> Any: aceita qualquer um desses acima
+    * A função recebe um nome e dentro do insomnia, para testar, podemos escolher o campo
+    Multipart Form, onde é possível escolher uma file
+
+
+COMANDOS e FUNÇÕES:
+Comando Omit<>:
+  * Recebe dois argumentos: o tipo da váriavel e o que você quer omitir
+  * Serve para váriaveis que vão receber alguns valores fixos e não enviador pelo usuário
+Função split:
+  * Vai dividir uma informação em mais de uma parte, como uma string em duas strings, podemos
+  colocar isso num array desentruturado. Ela recebe o momento aonde será feita a divisão, que
+  pode ser um espaço em branco (Ex: authHeader.split(' '))
+Comando as:
+  * podemos usar o as entre uma váriavel e um tipo para forçar que ele seja daquele tipo
+  (decoded as TokenPayload;)
+Classe Path (Node):
+  * Path é usado para lidar com caminhos no node
+  .resolve = define um caminho, ele recebe todas as partes do caminho sem as /'s
+  .join = junta nomes de caminhos para chegar num caminho final (recebe 2 strings de caminho)
+Classe fs (fileSystem) (Node):
+  * Ajuda na manipulação de arquivos no geral
+  .promises = faz com que o que seja recebido seja recebido em forma de promise, pode ser
+  usado em conjunto com outras funções
+  .stat = checa se um arquivo realmente existe, recebe um caminho como parâmetro
+  .unlink = deleta um arquivo, recebe o caminho do arquivo a ser deletado com parâmetro
+Pacote express:
+  .static = mostrar uma pasta de forma estática, recebe um caminho como parâmetro, que é o
+  caminho do arquivo para mostrar.
+  * yarn add express-async-errors --> adicionando uma forma de conseguir receber erros no
+  express em funções async await, devemos importar ele logo dps do express
+
+
+* Reindent Lines - no menu do VSCode para reidentar as linhas para seu formato
+
+
+HACKS do TypeScript:
+  * Podemos mudar os tipos de um pacote ao criar uma pasta (@types) com arquivos no formato
+  pacote.d.ts e dentro usamos um padrão como esse exemplo:
+
+  declare namespace express{
+    export interface Request{
+
+    }
+  }
+
+  E o que fica dentro é sobreposto junto das informações que já estão dentro, nesse caso o que
+  fica dentro do export tbm vai entrar no Request.
+
+
+REAAAAAAAAAAAAAAAAAAAAAAACT uhul:
+
+React Router DOM:
+  * Famosa biblioteca para lidar com rotas no React
+  * yarn add react-router-dom --> adicionando o React Router DOM no nosso projeto
+  * yarn add @types/react-router-dom -D --> adicionar tipagem do RRD
+  Métodos do pacote:
+    - Switch: o Switch faz com que só uma rota validada seja mostrada, caso não coloquemos o
+    e a rota validar duas rotas, as duas rotas vão aparecer por completo.
+    - Route: as rotas especificão exatamente o que elas dizem, as rotas, você inclui um path para
+    essa rota e a informação dentro dela. Algo interessante é que as rotas vão diretamente para a
+    primeira rota que ela acha, então se você quiser algo exato, como uma rota /, coloque exact
+      ** Dentro de uma rota, quando queremos que ele receba um parâmetro adicional, colocamos
+      /rota/:adicional e ainda podemos colocar o +, para dizer que ele deve ler tudo que vem
+      depois dessa segunda /
+      Ex: /rota/:adicional+
+    - BrowserRouter: funciona como o endereço da rota, sendo ele ditado pelo path das rotas,
+    usamos em voltar do Routes no arquivo App.tsx principal do código.
+    - Link: é um método que funciona como a âncora (a) do HTML, mas ele que deve ser usado no
+    react, pois ele não faz o carregamento de página. Ao invés do "href" ele possui o "to"
+    MAAAS ele é usado para ancoragem interna, para ir para fora da sua aplicação usamos "a"
+    - useRouteMatch: um método que guarda os parâmetros da minha rota (params)
+
+
+Styled Components:
+  * Com a necessidade de mais organização e controle do CSS os styled components foram ficando
+  famosos, pois eles isolam o CSS em componentes, fazendo com que eles não interfiram no resto
+  da aplicação
+  * yarn add styled-components --> adicionando Styled Components no projeto
+  * yarn add @types/styled-components -D --> adicionando os tipos do SC
+  * vscode styled components --> Baixar na loja para estilizar o styled components
+  * Para usamos o SC, nós importamos o styled e criamos uma constante que recebe um styled com o
+  que queremos modificar (h1, por exemplo) e dentro de `` nós colocamos o CSS.
+  * O SC permite com que usemos dos métodos dos compinentes dentro dos estilos! Como mudar a
+  estilização de um componente caso ocorra um erro. Para fazer isso podemos criar novos métodos
+  para os componentes através de uma interface dentro do styles e dar essa interface para o
+  componente desejado
+  Métodos do SC:
+    - createGlobalStyle: cria uma style global para ser usado por todas as páginas, colocamos
+    ele na página de App
+
+
+Polished:
+  * Permite a gente trabalhar com cores, escurecer, clarear, mexer com os padrões etc...
+  Métodos: (todos os métodos devem ser colocador dentro de ${})
+   - Shade: usado apra mexer com sombreamento, recebe a porcentagem do sombreamento e a cor
+   que você quer escurecer.
+
+
+React Icons:
+  * pacote que permite você utilizar de todos os ícones disponíveis para react
+  * yarn add react-icons --> adicionando react icons ao projeto
+
+
+Local Storage (localStorage):
+  O local storage é o armazenamento local da nossa máquina, usamos mt para testes
+  * Métodos do localStorage
+    - setItem: ele coloca um item no storage, recebendo 2 strings, o primeiro é um
+    '@nomeDaAplicação:oQueVaiSerSalvo' (para não conflitar com outras aplicações que estejam
+    usando o localhost) e o segundo é o que você quer salvar, caso não seja uma string podemos
+    usar o stringify do JSON.
+
+
+JSON métodos:
+  - stringify: transforma uma váriavel em string no formato de json! Recebe a váriavel a ser
+  transformada.
+
+
+
+* Podemos escrever funções no React como constantes para que fique mais fácil de fazer a tipagem,
+e a tipagem de uma função normalmente é React.FC (FunctionComponent)
+
+
+
+Informações do React para organizar depois:
+  * FormEvent: é um tipo de retorno que represente a função de submit do formulário! Ele tem que
+  receber <HTMLFormElement> (isso é dado a um evento, então podemos usar vários métodos)
+    - preventDefault(); (prevê o comportamento comum de um submit, que é recarregar a pag)
+  * Tipagem de useState: quando o useState não de um valor normal, é importante que definirmos
+  a tipagem dele manualmente em forma de interface, MAAS não precisamos colocar todas as
+  informações e sim somente as que vão ser necessárias, que vamos utilizar.
+  * Forma simplificada de usar um IF --> { inputError && <Error>{inputError}</Error> }
+  se essa váriavel tiver alguma coisa, ela coloca cria esse component!
+  * No JavaScript todas as variáveis tem um valor truthy e falsy:
+    Number: 0 - falsy / 5 - truthy
+    String: '' - falsy / 'dasdas' - truthy
+    Array: [] - falsy / [dsad, dasd, dasd] - truthy
+    ! -> Uma exclamação faz com que ele seja invertido (true para false)
+    !! -> Duas fazem com que ele seja convertido e dps seja novamente (true para false para true)
+  * o useEffect é um método do pacote react que faz com que uma função seja rodada toda vez que
+  um evento acontecer, como a mudança de um array. Ele recebe a função que sera efetuada e o
+  evento que triga ela.
+	* O useEffect não aceita async await, quando queremos usar essa forma de requisição devemos
+  criar uma função dentro do useEffect com nossas requisições já chamar a função logo dps.
+    - Algo interessante é que ASYNC AWAIT faz com a próxima linha só seja realizada quando a
+    requisição terminar, para resolver isso podemos usar o método .all de Promise (Promise.all)
+    que recebe as requisições em forma de array e retorna as repostas em array tbm.
+    Exemplo:
+    async function loadData(): Promise<void> {
+      const [ repository, issues ] = Promise.all([
+        api.get(rota);
+        api.get(rota2);
+      ])
+    } (PS: Promise tem vários métodos interessantes para lidar com requisições)
+	* yarn add cors @types/cors → adicionar cors para conectar com backend
+
+
+
+Informações aleatórias porém interessantes de Diego Fernandes:
+  * Nunca retornar uma mensagem dizendo qual informação está errada, seja e-mail ou senha,
+  pois deixa mais fácil para quem tem más intenções de entrar em uma conta alheia.
+  * Sempre fazer com que o código seja claro e seja fácil de entender o que está acontecendo
+  * !!! IMPORTANTE !!! Tudo que é incluído no request ou response de um middleware fica para
+  rotas subsequentes poderem usar
+  * Nunca salvar a imagem inteira dentro do banco de dados por que deixa ele muito pesado
+  * No React, quando temos uma função que tem return, podemos colocar um parênteses direto
+  para já dar uma return automatico.
+  * Quando estamos estilizando uma interface, podemos olhar para os elementos dela e se perguntar
+  "O próximo elemento é horizontal? Se for, o próximo também é?" Fazemos essa pergunta até
+  encontrarmos um container vertical, então eles terá que ser colocado num container separado.
+  * Ao fazer a estilização sempre tentar manter cada styled component só com 2 NÍVEIS abaixo
+  acima disso o styled começa a ficar muito bagunçado.
+  (ContainerStyled) <header> 1N <div> 2N <ul> 3N
